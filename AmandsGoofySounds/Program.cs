@@ -1,4 +1,4 @@
-﻿using BepInEx;
+using BepInEx;
 using BepInEx.Configuration;
 using EFT;
 using System.Reflection;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace AmandsGoofySounds
 {
-    [BepInPlugin("com.Amanda.GoofySounds", "GoofySounds", "1.0.0")]
+    [BepInPlugin("com.Amanda.GoofySounds", "GoofySounds", "1.0.1")]
     public class AmandsGoofySoundsPlugin : BaseUnityPlugin
     {
         public static GameObject Hook;
@@ -76,7 +76,7 @@ namespace AmandsGoofySounds
         [PatchPostfix]
         private static void PatchPostFix(ref Player __instance, Player aggressor, DamageInfo damageInfo, EBodyPart bodyPart, EDamageType lethalDamageType)
         {
-            if (UnityEngine.Random.Range(0.0f, 0.99f) < AmandsGoofySoundsPlugin.DeathChance.Value) AmandsGoofySoundsPlugin.AmandsGoofySoundsClassComponent.PlaySoundDeath(damageInfo.HitPoint);
+            if (UnityEngine.Random.Range(0.0f, 0.99f) < AmandsGoofySoundsPlugin.DeathChance.Value && !__instance.IsYourPlayer) AmandsGoofySoundsPlugin.AmandsGoofySoundsClassComponent.PlaySoundDeath(damageInfo.HitPoint);
         }
     }
     public class AmandsGoofySoundsDamagePatch : ModulePatch
@@ -88,7 +88,7 @@ namespace AmandsGoofySounds
         [PatchPostfix]
         private static void PatchPostFix(ref Player __instance, DamageInfo damageInfo, EBodyPart bodyPartType)
         {
-            if (UnityEngine.Random.Range(0.0f, 0.99f) < AmandsGoofySoundsPlugin.HitChance.Value) AmandsGoofySoundsPlugin.AmandsGoofySoundsClassComponent.PlayAmandsGoofySounds(__instance, ESoundType.Hit);
+            if (UnityEngine.Random.Range(0.0f, 0.99f) < AmandsGoofySoundsPlugin.HitChance.Value && !__instance.IsYourPlayer) AmandsGoofySoundsPlugin.AmandsGoofySoundsClassComponent.PlayAmandsGoofySounds(ESoundType.Hit,__instance.ProfileId,__instance.Position,__instance.Transform.Original);
         }
     }
     public class AmandsGoofySoundsGoalPatch : ModulePatch
@@ -108,12 +108,12 @@ namespace AmandsGoofySounds
                 IAIDetails person = (IAIDetails)goalEnemy.GetType().GetProperty("Person").GetValue(goalEnemy);
                 bool isVisible = (bool)goalEnemy.GetType().GetProperty("IsVisible").GetValue(goalEnemy);
 
-                if (person.GetPlayer.IsYourPlayer && isVisible)
+                if (person.IsYourPlayer && isVisible)
                 {
                     if (TimeTest < Time.time)
                     {
                         TimeTest = Time.time + AmandsGoofySoundsPlugin.SpottedCooldown.Value;
-                        if (UnityEngine.Random.Range(0.0f, 0.99f) < AmandsGoofySoundsPlugin.SpottedChance.Value) AmandsGoofySoundsPlugin.AmandsGoofySoundsClassComponent.PlayAmandsGoofySounds(bot.GetPlayer, ESoundType.Spotted);
+                        if (UnityEngine.Random.Range(0.0f, 0.99f) < AmandsGoofySoundsPlugin.SpottedChance.Value) AmandsGoofySoundsPlugin.AmandsGoofySoundsClassComponent.PlayAmandsGoofySounds(ESoundType.Spotted, bot.GetPlayer.ProfileId, bot.GetPlayer.Position, bot.GetPlayer.Transform.Original) ;
                     }
                 }
             }
