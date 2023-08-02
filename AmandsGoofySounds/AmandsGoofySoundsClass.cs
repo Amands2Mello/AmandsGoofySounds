@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.IO;
@@ -29,37 +29,38 @@ namespace AmandsGoofySounds
             await Task.Delay((int)(UnityEngine.Random.Range(AmandsGoofySoundsPlugin.MinRandom.Value, AmandsGoofySoundsPlugin.MaxRandom.Value) * 1000));
             if (localPlayer != null)
             {
-                List<Player> SoundPlayers = new List<Player>();
-                foreach (Player player in Singleton<GameWorld>.Instance.RegisteredPlayers)
+                List<IAIDetails> SoundPlayers = new List<IAIDetails>();
+                foreach (IAIDetails AIDetails in Singleton<GameWorld>.Instance.RegisteredPlayers)
                 {
-                    if (player == localPlayer) continue;
-                    if (Vector3.Distance(localPlayer.Position, player.Position) < AmandsGoofySoundsPlugin.Distance.Value) SoundPlayers.Add(player);
+                    if (AIDetails.IsYourPlayer) continue;
+                    if (Vector3.Distance(localPlayer.Position, AIDetails.Position) < AmandsGoofySoundsPlugin.Distance.Value) SoundPlayers.Add(AIDetails);
                 }
                 if (SoundPlayers.Count != 0 && (UnityEngine.Random.Range(0.0f, 0.99f) < AmandsGoofySoundsPlugin.RandomChance.Value))
                 {
                     System.Random rnd = new System.Random();
-                    PlayAmandsGoofySounds(SoundPlayers[rnd.Next(SoundPlayers.Count)], ESoundType.Random);
+                    IAIDetails AIDetails = SoundPlayers[rnd.Next(SoundPlayers.Count)];
+                    PlayAmandsGoofySounds(ESoundType.Random,AIDetails.ProfileId,AIDetails.Position,AIDetails.Transform.Original);
                 }
                 PlaySoundRandom();
             }
         }
-        public void PlayAmandsGoofySounds(Player player, ESoundType soundType)
+        public void PlayAmandsGoofySounds(ESoundType soundType, string ProfileId, Vector3 Position, Transform Original)
         {
-            if (player != null && localPlayer != null)
+            if (localPlayer != null)
             {
-                if (Vector3.Distance(localPlayer.Position, player.Position) > AmandsGoofySoundsPlugin.Distance.Value) return;
-                if (Playing.ContainsKey(player.ProfileId))
+                if (Vector3.Distance(localPlayer.Position, Position) > AmandsGoofySoundsPlugin.Distance.Value) return;
+                if (Playing.ContainsKey(ProfileId))
                 {
-                    if (Playing[player.ProfileId] < Time.time)
+                    if (Playing[ProfileId] < Time.time)
                     {
-                        Playing.Remove(player.ProfileId);
+                        Playing.Remove(ProfileId);
                     }
                     else
                     {
                         return;
                     }
                 }
-                if (AmandsGoofySoundsPlugin.EnableSounds.Value && player != localPlayer)
+                if (AmandsGoofySoundsPlugin.EnableSounds.Value)
                 {
                     System.Random rnd = new System.Random();
                     AudioClip audioClip = null;
@@ -77,8 +78,8 @@ namespace AmandsGoofySounds
                     }
                     if (audioClip != null)
                     {
-                        Singleton<BetterAudio>.Instance.PlayAtPoint(player.Position, audioClip, AmandsGoofySoundsPlugin.Distance.Value, BetterAudio.AudioSourceGroupType.Character, AmandsGoofySoundsPlugin.Rolloff.Value, AmandsGoofySoundsPlugin.Volume.Value, EOcclusionTest.Regular).transform.SetParent(player.Transform.Original);
-                        Playing.Add(player.ProfileId, Time.time + audioClip.length);
+                        Singleton<BetterAudio>.Instance.PlayAtPoint(Position, audioClip, AmandsGoofySoundsPlugin.Distance.Value, BetterAudio.AudioSourceGroupType.Character, AmandsGoofySoundsPlugin.Rolloff.Value, AmandsGoofySoundsPlugin.Volume.Value, EOcclusionTest.Regular).transform.SetParent(Original);
+                        Playing.Add(ProfileId, Time.time + audioClip.length);
                     }
                 }
             }
@@ -98,22 +99,22 @@ namespace AmandsGoofySounds
         }
         public void ReloadFiles()
         {
-            string[] AudioFiles = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "/BepInEx/plugins/Sound/Random/");
+            string[] AudioFiles = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "/BepInEx/plugins/GoofySounds/Random/");
             foreach (string File in AudioFiles)
             {
                 LoadAudioClip(File, ESoundType.Random);
             }
-            AudioFiles = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "/BepInEx/plugins/Sound/Hit/");
+            AudioFiles = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "/BepInEx/plugins/GoofySounds/Hit/");
             foreach (string File in AudioFiles)
             {
                 LoadAudioClip(File, ESoundType.Hit);
             }
-            AudioFiles = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "/BepInEx/plugins/Sound/Death/");
+            AudioFiles = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "/BepInEx/plugins/GoofySounds/Death/");
             foreach (string File in AudioFiles)
             {
                 LoadAudioClip(File, ESoundType.Death);
             }
-            AudioFiles = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "/BepInEx/plugins/Sound/Spotted/");
+            AudioFiles = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "/BepInEx/plugins/GoofySounds/Spotted/");
             foreach (string File in AudioFiles)
             {
                 LoadAudioClip(File, ESoundType.Spotted);
