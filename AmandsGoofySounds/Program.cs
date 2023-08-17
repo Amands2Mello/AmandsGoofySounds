@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace AmandsGoofySounds
 {
-    [BepInPlugin("com.Amanda.GoofySounds", "GoofySounds", "1.0.1")]
+    [BepInPlugin("com.Amanda.GoofySounds", "GoofySounds", "1.0.2")]
     public class AmandsGoofySoundsPlugin : BaseUnityPlugin
     {
         public static GameObject Hook;
@@ -64,6 +64,7 @@ namespace AmandsGoofySounds
             {
                 AmandsGoofySoundsClass.localPlayer = localPlayer;
                 AmandsGoofySoundsPlugin.AmandsGoofySoundsClassComponent.PlaySoundRandom();
+                AmandsGoofySoundsPlugin.AmandsGoofySoundsClassComponent.ReloadFiles();
             }
         }
     }
