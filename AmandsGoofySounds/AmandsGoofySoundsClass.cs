@@ -99,6 +99,10 @@ namespace AmandsGoofySounds
         }
         public void ReloadFiles()
         {
+            SoundRandom.Clear();
+            SoundHit.Clear();
+            SoundDeath.Clear();
+            SoundSpotted.Clear();
             string[] AudioFiles = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "/BepInEx/plugins/GoofySounds/Random/");
             foreach (string File in AudioFiles)
             {
