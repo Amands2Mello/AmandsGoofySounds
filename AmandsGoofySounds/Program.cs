@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace AmandsGoofySounds
 {
-    [BepInPlugin("com.Amanda.GoofySounds", "GoofySounds", "1.0.2")]
+    [BepInPlugin("com.Amanda.GoofySounds", "GoofySounds", "1.0.3")]
     public class AmandsGoofySoundsPlugin : BaseUnityPlugin
     {
         public static GameObject Hook;
@@ -97,7 +97,7 @@ namespace AmandsGoofySounds
         public static float TimeTest = 0;
         protected override MethodBase GetTargetMethod()
         {
-            return typeof(BotGroupClass).GetMethod("CalcGoalForBot");
+            return typeof(BotsGroup).GetMethod("CalcGoalForBot");
         }
         [PatchPostfix]
         public static void PatchPostfix(BotOwner bot)
@@ -106,7 +106,7 @@ namespace AmandsGoofySounds
 
             if (goalEnemy != null)
             {
-                IAIDetails person = (IAIDetails)goalEnemy.GetType().GetProperty("Person").GetValue(goalEnemy);
+                IPlayer person = (IPlayer)goalEnemy.GetType().GetProperty("Person").GetValue(goalEnemy);
                 bool isVisible = (bool)goalEnemy.GetType().GetProperty("IsVisible").GetValue(goalEnemy);
 
                 if (person.IsYourPlayer && isVisible)
