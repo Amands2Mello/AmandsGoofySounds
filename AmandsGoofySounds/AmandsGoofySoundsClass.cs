@@ -29,8 +29,8 @@ namespace AmandsGoofySounds
             await Task.Delay((int)(UnityEngine.Random.Range(AmandsGoofySoundsPlugin.MinRandom.Value, AmandsGoofySoundsPlugin.MaxRandom.Value) * 1000));
             if (localPlayer != null)
             {
-                List<IAIDetails> SoundPlayers = new List<IAIDetails>();
-                foreach (IAIDetails AIDetails in Singleton<GameWorld>.Instance.RegisteredPlayers)
+                List<IPlayer> SoundPlayers = new List<IPlayer>();
+                foreach (IPlayer AIDetails in Singleton<GameWorld>.Instance.RegisteredPlayers)
                 {
                     if (AIDetails.IsYourPlayer) continue;
                     if (Vector3.Distance(localPlayer.Position, AIDetails.Position) < AmandsGoofySoundsPlugin.Distance.Value) SoundPlayers.Add(AIDetails);
@@ -38,7 +38,7 @@ namespace AmandsGoofySounds
                 if (SoundPlayers.Count != 0 && (UnityEngine.Random.Range(0.0f, 0.99f) < AmandsGoofySoundsPlugin.RandomChance.Value))
                 {
                     System.Random rnd = new System.Random();
-                    IAIDetails AIDetails = SoundPlayers[rnd.Next(SoundPlayers.Count)];
+                    IPlayer AIDetails = SoundPlayers[rnd.Next(SoundPlayers.Count)];
                     PlayAmandsGoofySounds(ESoundType.Random,AIDetails.ProfileId,AIDetails.Position,AIDetails.Transform.Original);
                 }
                 PlaySoundRandom();
